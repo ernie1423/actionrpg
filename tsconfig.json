@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    // "composite": true,
+    "target": "ES5",
+    "lib": ["DOM"],
+    "module": "CommonJS",
+    "rootDir": "./src",
+    "outDir": "./build",
+    "moduleResolution": "Node",
+    "allowJs": true,
+    "removeComments": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true,
+    "declaration": false
+  },
+  "include": ["./src/*"]
+}
