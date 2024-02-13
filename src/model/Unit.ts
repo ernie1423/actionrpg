@@ -2,7 +2,8 @@ import * as PIXI from "pixi.js";
 import { Effect } from "./Effect";
 import { Entity } from "./Entity";
 import { Layer } from "./Layer";
-import { Body } from "matter-js";
+import { Body, Collision } from "matter-js";
+import { CollisionCategories } from "../config";
 
 export class Health {
     value: number
@@ -58,16 +59,22 @@ export abstract class Unit extends Entity {
     abilities: Ability<Unit & unknown>[]
     visuals: PIXI.Container
     body: Body;
-    
+    removed: boolean = false;
+
     constructor(b: Matter.Body, health: Health){
         super(b);
 
         this.body = b;
+        this.body.frictionAir = 0.15;
+
+        this.body.collisionFilter.category = CollisionCategories.Unit;
+        this.body.collisionFilter.mask = CollisionCategories.Unit | CollisionCategories.Wall;
         this.health = health;
         this.attributes = new Map();
         this.effects = [];
         this.abilities = [];
         this.visuals = new PIXI.Container();
+        this.visuals.position.set(this.body.position.x, this.body.position.y);
     }
 
     getAttributes(): ReadonlyMap<AttributeNames, Attribute> {
@@ -94,5 +101,10 @@ export abstract class Unit extends Entity {
         Health.update(this.health);
 
         this.visuals.position.set(this.body.position.x, this.body.position.y);
+
+        if(this.health.value <= 0){
+            layer.remove(this);
+            this.removed = true;
+        }
     }
 }

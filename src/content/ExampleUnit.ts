@@ -9,16 +9,14 @@ const health = 10;
 export class ExampleUnit extends Unit {
     constructor(position: Matter.Vector) {
         const body = Matter.Bodies.circle(position.x, position.y, size);
-        const visuals = new PIXI.Container();
+        
+        super(body, new Health(health));
+        
         const g = new PIXI.Graphics();
         g.beginFill(0xFFFFFF);
         g.drawCircle(0, 0, size);
         g.endFill();
-        visuals.addChild(g);
-        
-        super(body, new Health(health));
-
-        this.visuals = visuals;
+        this.visuals.addChild(g);
     }
 
     update(layer: Layer): void {

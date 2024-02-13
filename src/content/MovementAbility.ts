@@ -23,14 +23,17 @@ export class MovementAbility extends Ability<Unit> {
 
         this.isAvailable = false;
 
-        const speed = this.unit.getAttributes().get(AttributeNames.MovementSpeed)?.value || 5;
+        const speed = this.unit.getAttributes().get(AttributeNames.MovementSpeed)?.value || 0.5;
 
         if(!this.unit.body.isStatic)
-            Body.translate(
+            Body.setVelocity(
                 this.unit.body,
-                Vector.mult(
-                    Vector.normalise(direction),
-                    speed
+                Vector.add(
+                    this.unit.body.velocity,
+                    Vector.mult(
+                        Vector.normalise(direction),
+                        speed
+                    )
                 )
             )
         else {

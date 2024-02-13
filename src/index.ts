@@ -4,6 +4,7 @@ import { Layer } from './model/Layer';
 import * as PIXI from 'pixi.js'
 import { Player } from './content/Player';
 import { KeyboardControls } from './controls';
+import { Explosion } from './content/Explosion';
 
 const l = new Layer(500, 500);
 
@@ -28,12 +29,15 @@ setInterval(() => {
     l.visuals.setTransform(-player.visuals.position.x * cameraScale + app.screen.width/2, -player.visuals.position.y * cameraScale + app.screen.height/2)
 
     l.visuals.scale.set(cameraScale, cameraScale)
-
 }, 1000/60);
 
 l.add(player)
 l.add(new ExampleUnit(Matter.Vector.create(90, 50)))
 l.add(new ExampleUnit(Matter.Vector.create(50, 90)))
+
+setInterval(() => {
+    l.add(new Explosion(Matter.Vector.create(400, 400), 50));
+}, 1000);
 
 app.stage.addChild(l.visuals);
 

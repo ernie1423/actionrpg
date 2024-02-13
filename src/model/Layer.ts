@@ -1,6 +1,6 @@
 import Matter from "matter-js";
 import { Entity } from "./Entity";
-import { config } from "../config";
+import { CollisionCategories, config } from "../config";
 import * as PIXI from "pixi.js";
 
 export class Layer {
@@ -35,6 +35,7 @@ export class Layer {
             Matter.Bodies.rectangle(width, height/2, 1, height)
         ].forEach(w => {
             Matter.Body.setStatic(w, true)
+            w.collisionFilter.category = CollisionCategories.Wall; 
             Matter.Composite.add(this.engine.world, w)
         })
     }
