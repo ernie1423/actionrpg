@@ -54,7 +54,7 @@ export enum AttributeNames {
 export abstract class Unit extends Entity {
     health: Health
     effects: Effect[]
-    private attributes: Map<AttributeNames, Attribute>
+    protected attributes: Map<AttributeNames, Attribute>
     abilities: Ability<Unit & unknown>[]
     visuals: PIXI.Container
     body: Body;

@@ -7,6 +7,8 @@ export class Layer {
     entities: Entity[]
     engine: Matter.Engine
     visuals: PIXI.Container
+    width: number
+    height: number
     
     constructor(width: number, height: number){
         this.entities = [];
@@ -15,8 +17,16 @@ export class Layer {
             gravity: Matter.Vector.create(0, 0)
         })
 
-        this.visuals = new PIXI.Container();
+        this.width = width;
+        this.height = height;
 
+        this.visuals = new PIXI.Container();
+        const borderGraphics = new PIXI.Graphics();
+        
+        borderGraphics.beginFill(0x111111)
+        borderGraphics.drawRect(0, 0, width, height)
+
+        this.visuals.addChild(borderGraphics);
         
         [
             Matter.Bodies.rectangle(width/2, 0, width, 1),
