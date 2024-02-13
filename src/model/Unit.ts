@@ -31,7 +31,7 @@ export class Attribute {
     }
 }
 
-export abstract class Action<U extends Unit> {
+export abstract class Ability<U extends Unit> {
     unit?: U
     layer?: Layer
     
@@ -44,35 +44,16 @@ export abstract class Action<U extends Unit> {
         this.layer = l
     }
 
-    use(u: U, l: Layer){
+    use(){
         
     }
 }
 
-export class Behavior<U extends Unit> {
-    private actionPool: Action<U>[]
-
-    constructor(){
-        this.actionPool = [];
-    }
-
-    update(knownData: any){
-
-    }
-
-    pullActions(): Action<U>[] {
-        const result = this.actionPool.concat();
-        this.actionPool = [];
-
-        return result;
-    }
-}
-
 export abstract class Unit extends Entity {
-    behavior?: Behavior<unknown & Unit>
     health: Health
-    attributes: Map<string, Attribute>
     effects: Effect[]
+    private attributes: Map<string, Attribute>
+    abilities: Ability<Unit & unknown>[]
     
     constructor(b: Matter.Body, health: Health){
         super(b);
@@ -80,10 +61,19 @@ export abstract class Unit extends Entity {
         this.health = health;
         this.attributes = new Map();
         this.effects = [];
+        this.abilities = [];
+    }
+
+    getAttributes(): ReadonlyMap<string, Attribute> {
+        return this.attributes;
     }
 
     update(layer: Layer) {
         super.update(layer);
+
+        this.attributes.forEach(a => {
+            Attribute.update(a);
+        })
 
         this.effects.forEach((e, i) => {
             e.update(this, layer);
@@ -91,10 +81,10 @@ export abstract class Unit extends Entity {
                 this.effects.splice(i, 1);
         })
 
-        Health.update(this.health);
-
-        this.attributes.forEach(a => {
-            Attribute.update(a);
+        this.abilities.forEach(a => {
+            a.update(this, layer);
         })
+
+        Health.update(this.health);
     }
 }
