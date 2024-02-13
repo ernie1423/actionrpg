@@ -48,7 +48,7 @@ export class Explosion extends Entity {
             u.health.value -= this.force/10;
             let force = Vector.sub(u.body.position, this.body.position);
             force = Vector.normalise(force);
-            force = Vector.mult(force, this.force * 0.5)
+            force = Vector.mult(force, this.force * 0.8)
 
             Body.setVelocity(
                 u.body,

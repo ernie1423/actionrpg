@@ -29,10 +29,10 @@ export class Layer {
         this.visuals.addChild(borderGraphics);
         
         [
-            Matter.Bodies.rectangle(width/2, 0, width, 1),
-            Matter.Bodies.rectangle(width/2, height, width, 1),
-            Matter.Bodies.rectangle(0, height/2, 1, height),
-            Matter.Bodies.rectangle(width, height/2, 1, height)
+            Matter.Bodies.rectangle(width/2, -250, width+1000, 500),
+            Matter.Bodies.rectangle(width/2, height+250, width+1000, 500),
+            Matter.Bodies.rectangle(-250, height/2, 500, height+1000),
+            Matter.Bodies.rectangle(width+250, height+250, 500, height+1000),
         ].forEach(w => {
             Matter.Body.setStatic(w, true)
             w.collisionFilter.category = CollisionCategories.Wall; 
