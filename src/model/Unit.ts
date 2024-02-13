@@ -1,6 +1,8 @@
+import * as PIXI from "pixi.js";
 import { Effect } from "./Effect";
 import { Entity } from "./Entity";
 import { Layer } from "./Layer";
+import { Body } from "matter-js";
 
 export class Health {
     value: number
@@ -43,28 +45,32 @@ export abstract class Ability<U extends Unit> {
         this.unit = u
         this.layer = l
     }
+}
 
-    use(){
-        
-    }
+export enum AttributeNames {
+    MovementSpeed = "movement-speed"
 }
 
 export abstract class Unit extends Entity {
     health: Health
     effects: Effect[]
-    private attributes: Map<string, Attribute>
+    private attributes: Map<AttributeNames, Attribute>
     abilities: Ability<Unit & unknown>[]
+    visuals: PIXI.Container
+    body: Body;
     
     constructor(b: Matter.Body, health: Health){
         super(b);
 
+        this.body = b;
         this.health = health;
         this.attributes = new Map();
         this.effects = [];
         this.abilities = [];
+        this.visuals = new PIXI.Container();
     }
 
-    getAttributes(): ReadonlyMap<string, Attribute> {
+    getAttributes(): ReadonlyMap<AttributeNames, Attribute> {
         return this.attributes;
     }
 
@@ -76,9 +82,9 @@ export abstract class Unit extends Entity {
         })
 
         this.effects.forEach((e, i) => {
-            e.update(this, layer);
             if(e.beingRemoved)
                 this.effects.splice(i, 1);
+            e.update(this, layer);
         })
 
         this.abilities.forEach(a => {
@@ -86,5 +92,7 @@ export abstract class Unit extends Entity {
         })
 
         Health.update(this.health);
+
+        this.visuals.position.set(this.body.position.x, this.body.position.y);
     }
 }
