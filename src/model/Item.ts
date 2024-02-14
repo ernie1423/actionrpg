@@ -4,6 +4,8 @@ import { Layer } from "./Layer";
 import * as PIXI from "pixi.js";
 import { CollisionCategories } from "../config";
 import { Unit } from "./Unit";
+import { focusedTooltip, inventory } from "../UI";
+import { player } from "..";
 
 // 1. Оружие
 // 2. Расходники
@@ -12,15 +14,18 @@ import { Unit } from "./Unit";
 
 export interface ItemOptions {
     name: string
+    trueName: string
 }
 
 export abstract class Item {
     protected unit?: Unit
     protected layer?: Layer
     name: string
+    trueName: string
 
     constructor(options: ItemOptions) {
         this.name = options.name;
+        this.trueName = options.trueName;
     }
 
     update(u: Unit, l: Layer){
@@ -62,10 +67,13 @@ export class Weapon extends Item {
     }
 }
 
+let alreadyLoaded: string[] = []
+
 export class DroppedItem extends Entity {
     visuals: PIXI.Container
     body: Matter.Body
     item: Item
+    beingRemoved: boolean = false;
 
     constructor(position: Matter.Vector, item: Item){
         super();
@@ -80,15 +88,43 @@ export class DroppedItem extends Entity {
         g.beginFill(0x000000, 200);
         g.drawCircle(0, 0, 12);
         g.endFill();
+        g.beginFill(0x666666, 255);
+        g.drawPolygon([-6, -3, 6, -3, 0, 6])
+        g.endFill();
 
         this.visuals.addChild(g);
-        
+
         this.visuals.position.set(this.body.position.x, this.body.position.y);
 
         this.item = item;
+
+        this.visuals.eventMode = 'static';
+
+        this.visuals.addEventListener('mousemove', e => {
+            focusedTooltip.visuals.setTransform(e.x, e.y - focusedTooltip.visuals.height + 5);
+            focusedTooltip.text = this.item.name;
+            focusedTooltip.visible = true;
+        })
+
+        this.visuals.addEventListener('mouseleave', e => {
+            focusedTooltip.visuals.setTransform(e.x, e.y - focusedTooltip.visuals.height + 5);
+            focusedTooltip.text = this.item.name;
+            focusedTooltip.visible = false;
+        })
+
+        this.visuals.addEventListener('click', e => {
+            this.beingRemoved = true;
+            focusedTooltip.visible = false;
+        })
     }
 
     update(layer: Layer): void {
         this.visuals.position.set(this.body.position.x, this.body.position.y);
+
+        if(this.beingRemoved){
+            player.inventory.items.push(this.item);
+            inventory.update();
+            layer.remove(this);
+        }
     }
 }

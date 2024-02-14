@@ -75,5 +75,6 @@ export class Player extends Unit {
     update(layer: Layer): void {
         super.update(layer);
         this.abilities[0].move(this.movementDirection);
+        this.inventory.update(this, layer);
     }
 }

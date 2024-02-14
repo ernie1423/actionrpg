@@ -5,11 +5,16 @@ import { CollisionCategories } from "../config";
 import * as PIXI from "pixi.js";
 import { Unit } from "../model/Unit";
 
+class Particle {
+
+}
+
 export class Explosion extends Entity {
     visuals: PIXI.Container
     body: Body
     force: number
     done: boolean = false;
+    animMaxFrame = 60;
 
     constructor(position: Vector, force: number){
         super();

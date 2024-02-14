@@ -4,6 +4,8 @@ import { CollisionCategories, config } from "../config";
 import * as PIXI from "pixi.js";
 import { DroppedItem } from "./Item";
 
+export const cellSize = 100;
+
 export class Layer {
     entities: Entity[]
     engine: Matter.Engine
@@ -32,6 +34,19 @@ export class Layer {
         borderGraphics.drawRect(0, 0, width, height)
 
         this.visuals.addChild(borderGraphics);
+        
+        for(let x = Math.ceil(width/cellSize) - 1; x >= 0; x--){
+            for(let y = Math.ceil(height/cellSize) - 1; y >= 0; y--){
+                if(Math.random() > 0.7){
+                    const g = new PIXI.Graphics();
+                    g.beginFill(0xFFFFFF, 0.05);
+                    g.drawRect(cellSize * 0.2 + cellSize * x, cellSize * 0.2 + cellSize * y, cellSize * 0.6, cellSize * 0.6)
+                    g.endFill();
+
+                    this.visuals.addChild(g);
+                }
+            }
+        }
         
         this.visuals.addChild(this.itemLayer);
         
