@@ -2,6 +2,7 @@ import Matter from "matter-js";
 import { Entity } from "./Entity";
 import { CollisionCategories, config } from "../config";
 import * as PIXI from "pixi.js";
+import { DroppedItem } from "./Item";
 
 export class Layer {
     entities: Entity[]
@@ -9,6 +10,8 @@ export class Layer {
     visuals: PIXI.Container
     width: number
     height: number
+
+    protected itemLayer: PIXI.Container
     
     constructor(width: number, height: number){
         this.entities = [];
@@ -21,12 +24,16 @@ export class Layer {
         this.height = height;
 
         this.visuals = new PIXI.Container();
+        this.itemLayer = new PIXI.Container();
+
         const borderGraphics = new PIXI.Graphics();
         
         borderGraphics.beginFill(0x111111)
         borderGraphics.drawRect(0, 0, width, height)
 
         this.visuals.addChild(borderGraphics);
+        
+        this.visuals.addChild(this.itemLayer);
         
         [
             Matter.Bodies.rectangle(width/2, -250, width+1000, 500),
@@ -54,8 +61,13 @@ export class Layer {
         if(entity.body)
             Matter.Composite.add(this.engine.world, entity.body);
         
-        if(entity.visuals)
-            this.visuals.addChild(entity.visuals)
+        if(entity.visuals){
+            if(entity instanceof DroppedItem){
+                this.itemLayer.addChild(entity.visuals);
+                console.log("Added item visuals")
+            }
+            else this.visuals.addChild(entity.visuals);
+        }
     }
 
     remove(entity: Entity){
@@ -64,7 +76,10 @@ export class Layer {
         if(entity.body)
             Matter.Composite.remove(this.engine.world, entity.body);
         
-        if(entity.visuals)
-            this.visuals.removeChild(entity.visuals)
+        if(entity.visuals){
+            if(entity instanceof DroppedItem)
+                this.itemLayer.removeChild(entity.visuals);
+            else this.visuals.removeChild(entity.visuals)
+        }
     }
 }

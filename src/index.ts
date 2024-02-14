@@ -5,6 +5,7 @@ import * as PIXI from 'pixi.js'
 import { Player } from './content/Player';
 import { KeyboardControls } from './controls';
 import { Explosion } from './content/Explosion';
+import { DroppedItem } from './model/Item';
 
 const l = new Layer(500, 500);
 
@@ -35,6 +36,7 @@ l.add(player)
 l.add(new ExampleUnit(Matter.Vector.create(90, 50)))
 l.add(new ExampleUnit(Matter.Vector.create(50, 90)))
 
+console.log(l.visuals.children)
 setInterval(() => {
     l.add(new Explosion(Matter.Vector.create(400, 400), 50));
 }, 1000);
