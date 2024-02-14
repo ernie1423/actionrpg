@@ -15,6 +15,8 @@ const app = new PIXI.Application({
     antialias: true
 })
 
+const UI = new PIXI.Container();
+
 const controls = new KeyboardControls();
 
 const player = new Player(Matter.Vector.create(250, 250));
@@ -29,7 +31,9 @@ setInterval(() => {
 
     l.visuals.setTransform(-player.visuals.position.x * cameraScale + app.screen.width/2, -player.visuals.position.y * cameraScale + app.screen.height/2)
 
-    l.visuals.scale.set(cameraScale, cameraScale)
+    l.visuals.scale.set(cameraScale, cameraScale);
+
+    controls.update();
 }, 1000/60);
 
 l.add(player)
@@ -42,5 +46,6 @@ setInterval(() => {
 }, 1000);
 
 app.stage.addChild(l.visuals);
+app.stage.addChild(UI);
 
 document.body.appendChild(app.view as HTMLCanvasElement)
