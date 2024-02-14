@@ -5,18 +5,18 @@ import { CollisionCategories } from "../config";
 import * as PIXI from "pixi.js";
 import { Unit } from "../model/Unit";
 
-export class Explosion extends Entity {
+export class Projectile extends Entity {
     visuals: PIXI.Container
     body: Body
-    force: number
     done: boolean = false;
-    animMaxFrame = 60;
+    velocity: Vector
+    damage: number
+    exceptions: Unit[]
 
-    constructor(position: Vector, force: number){
+    constructor(position: Vector, velocity: Vector, damage: number, exceptions: Unit[]){
         super();
 
-        const b = Bodies.circle(position.x, position.y, force);
-        this.force = force;
+        const b = Bodies.circle(position.x, position.y, 5);
         this.body = b;
 
         b.collisionFilter.category = CollisionCategories.Ghost;
@@ -26,10 +26,17 @@ export class Explosion extends Entity {
         this.visuals.position.set(this.body.position.x, this.body.position.y);
 
         const g = new PIXI.Graphics();
-        g.beginFill(0xFF0000);
-        g.drawCircle(0, 0, force);
+        g.beginFill(0xFFAAAA);
+        g.drawCircle(0, 0, 5);
         g.endFill();
         this.visuals.addChild(g);
+
+        this.velocity = velocity;
+
+        Body.setVelocity(this.body, velocity);
+        this.body.frictionAir = 0;
+        this.damage = damage;
+        this.exceptions = exceptions
     }
 
     update(layer: Layer): void {
@@ -43,21 +50,12 @@ export class Explosion extends Entity {
         let units = layer.entities.filter(e => e instanceof Unit) as Unit[];
         let collisions = Query.collides(this.body, units.map(u => u.body));
         
-        units = units.filter(u => collisions.some(c => c.bodyA == u.body && c.collided));
+        units = units.filter(u => !this.exceptions.some(e => e == u) && collisions.some(c => c.bodyA == u.body && c.collided));
 
         units.forEach(u => {
-            u.health.value -= this.force/10;
-            let force = Vector.sub(u.body.position, this.body.position);
-            force = Vector.normalise(force);
-            force = Vector.mult(force, this.force * 0.8)
-
-            Body.setVelocity(
-                u.body,
-                Vector.add(u.body.velocity, force)
-            )
+            u.health.value -= this.damage;
+            this.done = true;
         })
-
-        this.done = true;
 
         this.visuals.position.set(this.body.position.x, this.body.position.y);
     }

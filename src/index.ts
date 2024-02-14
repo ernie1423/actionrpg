@@ -9,21 +9,39 @@ import { focusedTooltip, inventory } from './UI';
 import { Component, DroppedItem, Item, Weapon } from './model/Item';
 import { Portal } from './content/Portal';
 import { Box } from './content/box';
+import { Gun } from './content/Gun';
 
-const layers = [new Layer(500, 500), new Layer(1000, 100)]
+const layers = [new Layer(500, 500), new Layer(1000, 100), new Layer(800, 800)]
 
-layers[0].add(new Portal(
+function linkLayers(l1: Layer, p1: Matter.Vector, l2: Layer, p2: Matter.Vector){
+    l1.add(new Portal(
+        p1,
+        [l2, p2]
+    ))
+    l2.add(new Portal(
+        p2,
+        [l1, p1]
+    ))
+}
+
+linkLayers(
+    layers[0],
     Matter.Vector.create(450, 250),
-    [layers[1], Matter.Vector.create(50, 50)]
-))
-layers[1].add(new Portal(
-    Matter.Vector.create(50, 50),
-    [layers[0], Matter.Vector.create(450, 250)]
-))
-// layers[0].add(new Box(
-//     Matter.Vector.create(250, 100),
-//     95, 95
-// ))
+    layers[1],
+    Matter.Vector.create(50, 50)
+)
+
+linkLayers(
+    layers[0],
+    Matter.Vector.create(250, 50),
+    layers[2],
+    Matter.Vector.create(400, 750)
+)
+for(let i = 10; i--; i > 0){
+    layers[2].add(new ExampleUnit(
+        Matter.Vector.create(400 + (Math.random() * 50 - 100), 400 + (Math.random() * 50 - 100))
+    ))
+}
 
 let currentLayer = layers[0];
 
@@ -33,6 +51,30 @@ export const app = new PIXI.Application({
     antialias: true
 })
 
+const mouse = {
+    held: false,
+    position: {
+        x: 0,
+        y: 0
+    }
+}
+
+document.body.appendChild(app.view as HTMLCanvasElement)
+
+console.log("abob", document.querySelector("canvas"))
+
+document.querySelector("canvas")!.addEventListener("mousedown", e => {
+    console.log("held")
+    mouse.held = true;
+})
+document.querySelector("canvas")!.addEventListener("mousemove", e => {
+    mouse.position.x = e.x;
+    mouse.position.y = e.y;
+})
+
+document.querySelector("canvas")!.addEventListener("mouseup", e => {
+    mouse.held = false;
+})
 const LayerVisuals = new PIXI.Container();
 
 const UI = new PIXI.Container();
@@ -74,24 +116,27 @@ setInterval(() => {
 
     if(controls.keysDuration.get("KeyQ") == 1)
         console.log(player.body.position)
+
+    if(mouse.held && player.inventory.equippedWeapon){
+        console.log("c")
+        let x = mouse.position.x - app.screen.width/2;
+        let y = mouse.position.y - app.screen.height/2;
+
+        player.inventory.equippedWeapon.use(Matter.Vector.create(x, y));
+    }
 }, 1000/60);
 
 currentLayer.add(player)
 currentLayer.add(new ExampleUnit(Matter.Vector.create(90, 50)))
 currentLayer.add(new ExampleUnit(Matter.Vector.create(50, 90)))
-currentLayer.add(new DroppedItem(Matter.Vector.create(0, 0), new Component({ name: "component alpha", trueName: "ComponentA", amount: 30 })))
-currentLayer.add(new DroppedItem(Matter.Vector.create(0, 0), new Component({ name: "component beta", trueName: "ComponentB", amount: 30 })))
-currentLayer.add(new DroppedItem(Matter.Vector.create(0, 0), new Weapon({ name: "weapon", trueName: "ComponentB" })))
+currentLayer.add(new DroppedItem(Matter.Vector.create(0, 0), new Component({ name: "A-component", trueName: "ComponentA", amount: 30 })))
+currentLayer.add(new DroppedItem(Matter.Vector.create(0, 0), new Component({ name: "B-component", trueName: "ComponentB", amount: 30 })))
+currentLayer.add(new DroppedItem(Matter.Vector.create(0, 0), new Gun({ name: "weapon", trueName: "weapon" })))
 
 console.log(currentLayer.visuals.children)
-setInterval(() => {
-    currentLayer.add(new Explosion(Matter.Vector.create(400, 400), 50));
-}, 1000);
 
 app.stage.addChild(LayerVisuals);
 app.stage.addChild(UI);
 
 app.stage.addChild(inventory.visuals);
 app.stage.addChild(focusedTooltip.visuals);
-
-document.body.appendChild(app.view as HTMLCanvasElement)
