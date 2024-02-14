@@ -129,8 +129,8 @@ setInterval(() => {
 currentLayer.add(player)
 currentLayer.add(new ExampleUnit(Matter.Vector.create(90, 50)))
 currentLayer.add(new ExampleUnit(Matter.Vector.create(50, 90)))
-currentLayer.add(new DroppedItem(Matter.Vector.create(0, 0), new Component({ name: "A-component", trueName: "ComponentA", amount: 30 })))
-currentLayer.add(new DroppedItem(Matter.Vector.create(0, 0), new Component({ name: "B-component", trueName: "ComponentB", amount: 30 })))
+currentLayer.add(new DroppedItem(Matter.Vector.create(0, 0), new Component({ name: "A-component", trueName: "componentA", amount: 30 })))
+currentLayer.add(new DroppedItem(Matter.Vector.create(0, 0), new Component({ name: "B-component", trueName: "componentB", amount: 30 })))
 currentLayer.add(new DroppedItem(Matter.Vector.create(0, 0), new Gun({ name: "weapon", trueName: "weapon" })))
 
 console.log(currentLayer.visuals.children)
